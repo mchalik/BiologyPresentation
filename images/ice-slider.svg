@@ -2,12 +2,12 @@
   <defs>
     <style>
       .cls-1 {
-        fill: #d1eaff;
-        stroke: #fff;
-        stroke-linejoin: round;
-        stroke-opacity: 0.35;
-        stroke-width: 8px;
-        fill-rule: evenodd;
+      fill: #d1eaff;
+      stroke: #fff;
+      stroke-linejoin: round;
+      stroke-opacity: 0.35;
+      stroke-width: 16px;
+      fill-rule: evenodd;
       }
     </style>
   </defs>

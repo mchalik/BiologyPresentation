@@ -1,16 +1,75 @@
 document.getElementsByClassName('main__wrapper')[0].dataset.page = localStorage.getItem('page') || 0;
 document.getElementsByClassName('section--slided')[0].dataset.slide = localStorage.getItem('slide') || 0;
 
-(function parallax() {
-    // getBoundingClinetRect().y
-    window.addEventListener("scroll", () => {
-        let iceElem = document.querySelectorAll('.js-paralax');
-        iceElem.forEach(function (e) {
-            let screenHeight = 768;
-            let neededTranslate = (-pageYOffset + screenHeight) / screenHeight / 10 * 1000;
-            e.style.transform = `translateY(${neededTranslate}%)`;
-        });
-    });
+let parallaxEvent = new CustomEvent('parallax');
+
+
+(function scrollPages() {
+    let initialPosition = null;
+    let moving = false;
+    let scrolled = false;
+    let slidesContainer = document.querySelector('.main__wrapper');
+    let page = parseInt(slidesContainer.dataset.page);
+    function scrollPageUp() {
+        if (page < 2) slidesContainer.dataset.page = ++page;
+        window.dispatchEvent(parallaxEvent);
+        localStorage.setItem("page", page.toString());
+    }
+    function scrollPageDown() {
+        if (page > 0) {
+            slidesContainer.dataset.page = --page;
+            window.dispatchEvent(parallaxEvent);
+            localStorage.setItem("page", page.toString());
+        }
+
+    }
+
+    let scrollStart = (e) => {
+        if (e.target.classList.contains('slider__ice'))  return;
+
+        initialPosition = e.pageY;
+        moving = true;
+    };
+
+
+    let scrollMove = (e) => {
+        if (!moving) return;
+        if (scrolled) return;
+        let currentPosition = e.pageY;
+        let diff = initialPosition - currentPosition;
+
+
+        if (diff > 20) {
+            scrollPageUp();
+            scrolled = true;
+        } else if (diff < -20) {
+            scrollPageDown();
+            scrolled = true;
+        }
+    };
+
+
+    let scrollEnd = (e) => {
+        moving = false;
+        scrolled = false;
+    };
+
+
+
+    if (window.PointerEvent) {
+        window.addEventListener('pointerdown', scrollStart);
+        window.addEventListener('pointermove', scrollMove);
+        window.addEventListener('pointerup', scrollEnd);
+
+    } else {
+        window.addEventListener('touchdown', scrollStart);
+        window.addEventListener('touchmove', scrollMove);
+        window.addEventListener('touchup', scrollEnd);
+
+        window.addEventListener('mousedown', scrollStart);
+        window.addEventListener('mousemove', scrollMove);
+        window.addEventListener('mouseup', scrollEnd);
+    }
 }());
 
 (function slideShow() {
@@ -57,6 +116,7 @@ document.getElementsByClassName('section--slided')[0].dataset.slide = localStora
             slideContainer.dataset.slide = 2;
             localStorage.setItem("slide", "2");
         }
+
     }
 
     const gestureStart = (e) => {
@@ -64,7 +124,6 @@ document.getElementsByClassName('section--slided')[0].dataset.slide = localStora
         moving = true;
         sliderInitialPosition = findLeftPosition(slider) || 0;
 
-        // let leftPosition =
     };
 
     const gestureMove = (e) => {
@@ -85,15 +144,25 @@ document.getElementsByClassName('section--slided')[0].dataset.slide = localStora
 
     const gestureEnd = (e) => {
         moving = false;
-        sliderEndPosition = findLeftPosition(slider);
+        let sliderInitPosition = parseInt(findLeftPosition(slider));
+        let sliderEndPosition = 0;
 
-        if (sliderEndPosition < 25) sliderEndPosition = 0;
-        else if (sliderEndPosition < 75) sliderEndPosition = 50;
-        else if (sliderEndPosition < 100) sliderEndPosition = 100;
+        if (sliderInitPosition < 25) sliderEndPosition = 0;
+        else if (sliderInitPosition < 75) sliderEndPosition = 50;
+        else if (sliderInitPosition <= 100) sliderEndPosition = 100;
 
+        (function loop() {
 
-        slider.style.left = sliderEndPosition + '%';
-        sliderFilledLine.style.width = sliderEndPosition + '%';
+            if (sliderInitPosition === sliderEndPosition ) return;
+            if (sliderInitPosition > sliderEndPosition) {
+                sliderInitPosition--;
+            } else {
+                sliderInitPosition++;
+            }
+            slider.style.left = sliderInitPosition + '%';
+            sliderFilledLine.style.width = sliderInitPosition + '%';
+            setTimeout(loop, 8);
+        }());
     };
 
 
@@ -114,73 +183,31 @@ document.getElementsByClassName('section--slided')[0].dataset.slide = localStora
     }
 }());
 
-(function scrollPages() {
-    // let initialSlide = null;
-    let initialPosition = null;
-    let moving = false;
-    let scrolled = false;
-    let slidesContainer = document.querySelector('.main__wrapper');
-    let page = parseInt(slidesContainer.dataset.page);
-    function scrollPageUp() {
-        if (page < 2) slidesContainer.dataset.page = ++page;
-        localStorage.setItem("page", page.toString());
-    }
-    function scrollPageDown() {
-        if (page > 0) {
-            slidesContainer.dataset.page = --page;
-            localStorage.setItem("page", page.toString());
-        }
-
-    }
-
-    // scrollPageUp();
-
-    let scrollStart = (e) => {
-        if (e.target.classList.contains('slider__ice'))  return;
-
-        initialPosition = e.pageY;
-        moving = true;
-    };
 
 
-    let scrollMove = (e) => {
-        if (!moving) return;
-        if (scrolled) return;
-        let currentPosition = e.pageY;
-        let diff = initialPosition - currentPosition;
+(function parallax() {
+    let iceElem = document.querySelectorAll('.js-parallax');
+    window.addEventListener("parallax", () => {
+        iceElem.forEach(function (e) {
 
+            const  screenHeight = 768;
 
-        if (diff > 10) {
-            scrollPageUp();
-            scrolled = true;
-        } else if (diff < -10) {
-            scrollPageDown();
-            scrolled = true;
-        }
-    };
+            let paralaxed = false;
+            const mainWrapper = document.querySelector('.main__wrapper');
+            mainWrapper.addEventListener('transitionend', (e) => {
+                setTimeout((e) => {
+                    paralaxed = true;
+                }, 1000);
+            });
+            (function loop() {
 
+                let mainWrapperYPosition = mainWrapper.getBoundingClientRect().y;
+                let neededTranslate = (mainWrapperYPosition + screenHeight) / screenHeight  * 300;
+                e.style.transform = `translateY(${neededTranslate}px)`;
+                if (paralaxed) return;
+                setTimeout(loop, 16);
+            }())
+        });
+    });
 
-    let scrollEnd = (e) => {
-        moving = false;
-        scrolled = false;
-        console.log(e);
-        console.log('End');
-    };
-
-
-
-    if (window.PointerEvent) {
-        window.addEventListener('pointerdown', scrollStart);
-        window.addEventListener('pointermove', scrollMove);
-        window.addEventListener('pointerup', scrollEnd);
-
-    } else {
-        window.addEventListener('touchdown', scrollStart);
-        window.addEventListener('touchmove', scrollMove);
-        window.addEventListener('touchup', scrollEnd);
-
-        window.addEventListener('mousedown', scrollStart);
-        window.addEventListener('mousemove', scrollMove);
-        window.addEventListener('mouseup', scrollEnd);
-    }
 }());
