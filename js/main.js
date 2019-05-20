@@ -86,18 +86,18 @@ const parallaxEvent = new CustomEvent('parallax');
     let sliderInitialPosition = 0;
 
     (function adjustSlider() {
-        const curentSlide = parseInt(slideContainer.dataset.slide);
+        const currentSlide = parseInt(slideContainer.dataset.slide);
 
-        switch (curentSlide) {
-            case 1:
+        switch (currentSlide) {
+            case 0:
                 slider.style.left = 0 + '%';
                 sliderFilledLine.style.width = 0 + '%';
                 break;
-            case 2:
+            case 1:
                 slider.style.left = 50 + '%';
                 sliderFilledLine.style.width = 50 + '%';
                 break;
-            case 3:
+            case 2:
                 slider.style.left = 100 + '%';
                 sliderFilledLine.style.width = 100 + '%';
                 break;
@@ -107,8 +107,8 @@ const parallaxEvent = new CustomEvent('parallax');
     function findLeftPosition(el) {
         const leftPositionString = window.getComputedStyle(el).left;
         const leftPositionNumber = parseFloat(leftPositionString.match(/\d+(\.\d+)?(?=px)/));
-        const leftPositionInPercents = leftPositionNumber / sliderLineWidth * 100;
-        return leftPositionInPercents;
+
+        return leftPositionNumber / sliderLineWidth * 100;
     }
 
     function switchSlide() {
