@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 document.getElementsByClassName('main__wrapper')[0].dataset.page = localStorage.getItem('page') || 0;
 document.getElementsByClassName('section--slided')[0].dataset.slide = localStorage.getItem('slide') || 0;
@@ -58,6 +58,15 @@ const parallaxEvent = new CustomEvent('parallax');
         scrolled = false;
     };
 
+    const wheelHandler = (e) => {
+        let y = e.deltaY;
+        if (y > 0) {
+            scrollPageUp();
+        } else {
+            scrollPageDown();
+        }
+
+    };
 
     if (window.PointerEvent) {
         window.addEventListener('pointerdown', scrollStart);
@@ -72,7 +81,12 @@ const parallaxEvent = new CustomEvent('parallax');
         window.addEventListener('mousedown', scrollStart);
         window.addEventListener('mousemove', scrollMove);
         window.addEventListener('mouseup', scrollEnd);
+
+        window.addEventListener('mousedown', scrollStart);
+        window.addEventListener('mousemove', scrollMove);
+        window.addEventListener('mouseup', scrollEnd);
     }
+    window.addEventListener('wheel', wheelHandler);
 }());
 
 (function slideShow() {
@@ -93,14 +107,18 @@ const parallaxEvent = new CustomEvent('parallax');
                 slider.style.left = 0 + '%';
                 sliderFilledLine.style.width = 0 + '%';
                 break;
+
             case 1:
                 slider.style.left = 50 + '%';
                 sliderFilledLine.style.width = 50 + '%';
                 break;
+
             case 2:
                 slider.style.left = 100 + '%';
                 sliderFilledLine.style.width = 100 + '%';
                 break;
+
+            default:
         }
     }());
 
@@ -225,3 +243,7 @@ const parallaxEvent = new CustomEvent('parallax');
         });
     });
 }());
+
+window.addEventListener('load', function() {
+    document.querySelector('.main').classList.remove('hidden');
+});

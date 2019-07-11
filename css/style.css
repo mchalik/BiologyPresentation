@@ -25,8 +25,13 @@
     background-color: #6ab4fc;
     overflow: hidden;
     height: 768px;
+    opacity: 1;
+    transition: opacity 5s;
 }
 
+.main.hidden {
+    opacity: 0;
+}
 .main__wrapper {
     position: relative;
     height: 2304px;
