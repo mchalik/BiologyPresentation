@@ -5,6 +5,7 @@ document.getElementsByClassName('section--slided')[0].dataset.slide = localStora
 
 const parallaxEvent = new CustomEvent('parallax');
 
+//TODO: Scale for resizing like shwr.me
 
 (function scrollPages() {
     const slidesContainer = document.querySelector('.main__wrapper');
