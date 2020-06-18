@@ -82,10 +82,6 @@ const parallaxEvent = new CustomEvent('parallax');
         window.addEventListener('mousedown', scrollStart);
         window.addEventListener('mousemove', scrollMove);
         window.addEventListener('mouseup', scrollEnd);
-
-        window.addEventListener('mousedown', scrollStart);
-        window.addEventListener('mousemove', scrollMove);
-        window.addEventListener('mouseup', scrollEnd);
     }
     window.addEventListener('wheel', wheelHandler);
 }());
